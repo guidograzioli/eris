@@ -29,7 +29,7 @@
 
 - name: "HERA: run"
   ansible.builtin.command: >
-    bash -x {{ hera_home }}/hera.sh run
+    bash -x {{ hera_home }}/hera.sh run-systemd
   args:
     chdir: "{{ workdir }}"
   register: hera_run
@@ -118,8 +118,9 @@
         msg: "{{ res_conf['content'] | b64decode }}"
 
     - name: "Wait {{ wait_for_sshd }} seconds for target connection to become reachable/usable"
-      ansible.builtin.wait_for_connection:
-        timeout: "{{ wait_for_sshd }}"
+      ansible.builtin.wait_for:
+        host: "{{ instance_conf_dict.address }}"
+        port: "{{ instance_conf_dict.port }}"
+        search_regex: OpenSSH
         delay: 15
         sleep: 5
-      delegate_to: olympus
